@@ -51,6 +51,16 @@ ariports.updateValue("LHR",forKey:"London")
 ariports["LHR"] = nil //移除键值对LHR
 airports = [:]//置空字典
 	```
++ switch case 语句中case分支的模式可以使用where语句来判断额外的条件
++ fallthrough(贯穿)，case语句匹配到之后再次往下执行匹配
++ guard：使用guard语句来要求条件必须为真时以执行guard语句之后的代码，否则执行else之后的代码
+	
+	```
+guard let name = person["name"] else{
+	return
+}
+	```
++ 可变参数放在参数表的最后
 + 枚举默认值：rawValue
 + mutating：标记一个会修改结构体的方法
 + 结构体对于内部的属性和方法是传值的，类是传应用的，如果结构体中的方法需要修改结构体中的某些属性则必须通过mutating关键字修饰该方法
