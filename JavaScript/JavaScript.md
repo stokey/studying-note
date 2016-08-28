@@ -36,3 +36,91 @@ another.nickname //'Curly'
 + 减少全局变量污染。最小化全局变量的方法之一就是创建一个唯一的全局变量，其它全局性资源作为该全局变量的属性存储到该全局变量中
 + **`所谓编程，就是将一组需求分解成一组函数与数据结构的技`**
 + JavaScript中的函数就是对象。对象字面量产生的对象连接到Object.prototype，函数对象连接到Function.prototype(该原型对象连接到Object.prototype)。每个函数在创建时会附加两个隐藏属性：函数的上下文和实现函数行为的代码
++ 每个函数对象在创建时会拥有一个prototype属性，它的值时一个拥有constructor属性且值即为该函数的对象
++ 函数在传递参数过程中除了接受声明时定义的形式参数，还需要接收两个附加的参数：`this`和`arguments（实际参数）`。参数`this`在面向对象编程中非常重要，它的取值决定于调用的模式
++ JavaScript中的调用模式:
+	+ 方法调用模式：`如果调用表达式包含一个提取属性的动作时则被视为一个方法来调用，即通过点表达式或者下标表达式调用（obj.increment()）。this绑定到调用对象上`
+	+ 函数调用模式：`当一个函数并非一个对象的属性时，则被视为当做一个函数来调用（ var sum = add(3,4);）。this被绑定到全局对象`
+	+ 构造器调用模式：`一个函数如果创建的目的就是希望结合new前缀来调用，那么它就被称构造器函数。`
+	
+		```
+//大写约定，保存在大写格式命名的变量里
+var Quo = function(string){
+	this.status = string;
+}
+Quo.prototype.get_status = function(){
+	return this.status;
+}
+//如果在一个函数前面带上new来调用，那么背地里将会创建一个连接到该函数的prototype成员的新对象，同时this会被绑定到那个新对象上
+var myQuo = new Quo("confused");
+myQu0.get_status();
+		```
+	+ apply调用模式：`apply方法接收两个参数，第一个是要绑定的给this的值，第二个就是参数数组。函数通过arguments数组传递参数列表。因为语言设计错误，arguments并不是一个真正的数组，只是一个“类似数组”的对象，拥有一个length属性，但没有任何数组的方法`
+	*不同调用模式在初始化关键字this上存在差异*
++ 调用运算符：`()`，函数声明时的参数为形式参数名。实际参数个数和形式参数个数可以不匹配，如果实际参数过多则多出的参数会被忽略，如果实际参数过少则少掉的参数会被设置为`undefined`
++ 当一函数被保存为一个对象的属性时，我们称它为一个方法。［**方法就是一个被类绑定的函数?**］。`this`到对象的绑定发生在函数调用的时候（**ES6可以通过bind()方法手动绑定this**)）
++ 函数调用模式带来的问题及解决：
+	+ 问题：`函数调用模式this被绑定到全局对象（严格模式下绑定到undefined）。内部函数取到的this也为全局对象，这导致内部函数无法访问到外部函数私有成员，无法起到相应作用`
+	+ 解决：`在外部函数定义个变量并给它赋值为this，则内部函数可以通过这个变量访问到this`
++ JavaScript允许给语言的基本类型扩充功能
+	
+	```
+	//通过给Function.prototype增加一个Methode方法，下次给对象增加方法的时候就不必键入prototype这几个字符
+	Function.prototype.method = function (name,func){
+		if(!this.prototype[name]){
+			this.prototype[name] = func;
+		}
+		return this;
+	}
+	Number.method('integer',function(){
+		return Math[this < 0 ? 'ceil' : 'floor'](this);
+	});
+	(-10/3).integer();//-3
+	String.method('trim',function(){
+		return this.replace(/^\s+|\s+$/g,'');
+	});
+	```
++ 作用域：控制着变量和参数的可见性及生命周期。从而减少了名称冲突，并且提供了自动内存管理
++ JavaScript的代码块语法貌似支持块级作用域，但是实际上JavaScript并不支持。JavaScript拥有函数作用域。意味着函数中的参数和变量在函数外部是不可见的，而在一个函数内部任何位置定义的变量，在该函数内部任何地方都可见。
+
+	```
+function testFunc(){
+	var num1 = 10,num2 =11;
+	console.log(`num1:${num1},num2:${num2}`);
+	{
+		var num3 = 12;
+	} 
+	console.log(`num3:${num3}`);
+}
+//不支持块级作用域，如果支持块级作用域num3应该输出为undefined
+//为了减少这一特性的影响，最好的做法就是在函数体的顶部声明函数中可能用到的所有变量
+testFunc();//输出num1:10,num2:11 num3:12
+	```
++ 闭包：函数可以访问它被创建时所处的上下文环境
++ 避免在循环中创建函数，它可能只会带来无谓的计算和混淆。
+
+	```
+//内部函数能访问外部函数的实际变量而无需复制
+var add = function(nodes){
+	var i;
+	for (i=0;i<nodes.length;i+=1){
+		nodes[i].onClick = function(e){
+			alert(i);//每次弹出都是节点总长度
+		}
+	}
+}
+//修改
+var add = function (nodes){
+	//	通过辅助函数绑定当前的i值后就不会发生混淆了
+	var helper = function(i){
+		return function(e){
+			alert(i);
+		}
+	}
+	var i;
+	for (i=0;i<nodes.length;i+=1){
+		nodes[i],onClick = helper(i);
+	}
+}
+	```
++ 模块：一个提供接口却隐藏状态与实现的函数或对象。可以通过使用函数和闭包来构造模块
