@@ -11,7 +11,7 @@
 	+ 数字`0`
 	+ 数字`NaN`
 + `for in`/`for of`：
-	+ `for in`：用于遍对象，会枚举一个对象的所有属性名称`[不应该用于遍历数组，遍历数组时取到下标值]`
+	+ `for in`：用于遍对象，会枚举一个对象的所有属性名称`[不应该用于遍历数组，遍历数组时取到下标值]，无法保证属性的顺序`
 	+ `for of`：用于遍历可迭代对象（*`Array,Map,Set,String,TypedArray,arguments`*）。遍历的事不同属性的属性值，遍历数组时取到的值而非下标。
 + Object.hasOwnProperty(*variable*)来确定这个属性名是否是该对象的成员
 + JavaScript数据类型：
@@ -124,3 +124,103 @@ var add = function (nodes){
 }
 	```
 + 模块：一个提供接口却隐藏状态与实现的函数或对象。可以通过使用函数和闭包来构造模块
++ 及联调用：函数链式调用，方法返回this而不是undefined时
++ 柯里化：允许把函数与传递给它的参数相结合，从而产生一个新的函数。（把多参数函数转换为一系列单参数函数并进行调用的技术）
+
+	```
+function loc(a,b,c){
+	console.log(a+'-'+b+'-'+c);
+}
+loc('浙江','杭州','西湖区');//输出：浙江－杭州－西湖区
+//函数不灵活
+function loc(a){
+	return function(b){
+		return function(c){
+			console.log(a+'-'+b+'-'+c);
+		}
+	}
+}
+var Zhejiang = log('浙江');
+var Hangzhou = Zhejiang('杭州');
+var Xihu = Hangzhou('西湖区');//输出：浙江－杭州－西湖区
+var Yuhang = Hangzhou('余杭区')//输出：浙江－杭州－余杭区
+//如果有100多个参数，如何解决多个函数嵌套
+function curry(fn){
+	//fn：需要被柯里化的函数
+	//arguments不是一个数组是一个类数组对象
+	var outerArgs = Array.prototype.slice.call(arguments,1);//取出除了第一个参数之外的所有参数，第一个参数为fn（需要被柯里化的函数）
+	return function(){
+		var innerArgs = Array.prototype.slice.call(arguments);
+		var finalArgs = outerArgs.concat(innerArgs);
+		return fn.apply(null,finalArgs);
+	}
+}
+var workIn = curry(loc,'浙江','杭州','西湖区');//输出：浙江－杭州－西湖区
+var Zhejiang = curry(loc,'浙江');
+var Hangzhou = curry(Zhejiang,'杭州');
+var Xihu = curry(Hangzhou,'西湖区');//输出：浙江－杭州－西湖区
+	```
++ 记忆：函数可以将先前的操作的结果记录在某个对象，从而避免无谓的重复计算。
+
+
++  当一个函数对象被创建时，Function构造器产生的函数对象会运行类似：`this.prototype = {constructor:this};`代码，新函数对象被赋予一个prototype属性，它的值是一个包含constructor属性且属性值为该新函数的对象。
++ 所有的构造函数都约定命名为首字母大写的形式，并且不以首字母大写的形式拼接任何其它的东西。便于检验是否缺少new前缀
++ 模块模式：解决继承模式隐私问题。（继承模式下对象的所有属性和方法都是可见的）
++ 函数化模式：
+	+ 创建一个新对象
+	+ 有选择地定义私有实例变量和方法
+	+ 给这个新对象扩充方法
+	+ 返回那个新对象
+  
+  通过函数作用域进行约束。
+ 
+  ```
+//name,saying属性现在完全是私有的，只有通过get_name和says两个特权方法才可以访问它们
+var mammal = function (spec){
+	var that = {};
+	that.get_name = function() {
+		return spec.name;
+	};
+	that.says = function(){
+		return spec.saying || '';
+	}
+	return that;
+}
+var myMammal = mammal({name:'Herb'});
+var cat = function (spec) {
+	spec.saying = spec.saying || 'meow';
+	var that = mammal(spec);
+	that.purr = function (n){
+		var i,s='';
+		for (i=0;i<n;i+=1){
+			if(s){
+				s += '-';
+			}
+			s += 'r';
+		}
+		return s;
+	}
+	that.get_name = function () {
+		return that.says()+' '+ spec.name+' '+that.says();
+	}
+	return that;
+}
+var myCat = cat({name:'Henrietta'});
+  ```
++ JavaScript数组的length属性的值是这个数组的最大整数属性名加上一。
++ 数组删除元素：`delete numbers[2];//会删除numbers第三个元素的所属属性的值，但是继续占据numbers第三个元素值位置（undefined）`,`numbers.splice(2,1);//会从下标为2的位置删除1个元素`
++ JavaScript本身对于数组和对象的区别是混乱的。typeof运算符报告数组的类型是object
+
+  ```
+var is_array = function (value) {
+	return Object.prototype.toString.apply(value) === '[Object Array]';
+};
+  ```
++ 可处理正则表达式的方法有`regexp.exec/test,string.match/replace/search/split`。正则表达式必须写在一行中。
+	
+  ```
+//匹配URL匹配符
+var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
+//^字符表示此字符串的开始
+//(?:([A-Za-z]+):)?：这个因子匹配一个协议名，仅当它后面跟随一个:（冒号）的时候才匹配。(?:...)表示一个非捕获型分组。后缀?表示这个分组可选。(...)表示一个捕获型分组，[...]表示一个字符类，（-）连字符表示范围，后缀+表示这个字符类会被匹配一次或多次。\/表示应该匹配。后缀{0,3}表示/会被匹配0次或者1～3次。\d表示一个数字字符，［^?#］表示这个类包含除?和#之外的所有字符。*表示这个字符类会被匹配0次或多次。
+  ```
