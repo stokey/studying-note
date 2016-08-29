@@ -207,6 +207,7 @@ var cat = function (spec) {
 }
 var myCat = cat({name:'Henrietta'});
   ```
+
 + JavaScript数组的length属性的值是这个数组的最大整数属性名加上一。
 + 数组删除元素：`delete numbers[2];//会删除numbers第三个元素的所属属性的值，但是继续占据numbers第三个元素值位置（undefined）`,`numbers.splice(2,1);//会从下标为2的位置删除1个元素`
 + JavaScript本身对于数组和对象的区别是混乱的。typeof运算符报告数组的类型是object
@@ -216,11 +217,47 @@ var is_array = function (value) {
 	return Object.prototype.toString.apply(value) === '[Object Array]';
 };
   ```
+
 + 可处理正则表达式的方法有`regexp.exec/test,string.match/replace/search/split`。正则表达式必须写在一行中。
 	
   ```
 //匹配URL匹配符
 var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
 //^字符表示此字符串的开始
-//(?:([A-Za-z]+):)?：这个因子匹配一个协议名，仅当它后面跟随一个:（冒号）的时候才匹配。(?:...)表示一个非捕获型分组。后缀?表示这个分组可选。(...)表示一个捕获型分组，[...]表示一个字符类，（-）连字符表示范围，后缀+表示这个字符类会被匹配一次或多次。\/表示应该匹配。后缀{0,3}表示/会被匹配0次或者1～3次。\d表示一个数字字符，［^?#］表示这个类包含除?和#之外的所有字符。*表示这个字符类会被匹配0次或多次。
+//(?:([A-Za-z]+):)?：这个因子匹配一个协议名，仅当它后面跟随一个:（冒号）的时候才匹配。(?:...)表示一个非捕获型分组。后缀?表示这个分组可选。(...)表示一个捕获型分组，[...]表示一个字符类，（-）连字符表示范围，后缀+表示这个字符类会被匹配一次或多次。\/表示应该匹配。后缀{0,3}表示/会被匹配0次或者1～3次。\d表示一个数字字符，［^?#］表示这个类包含除?和#之外的所有字符。*表示这个字符类会被匹配0次或多次。$表示这个字符串的结束。
   ```
+
++ 正则表达式标识
+	+ g：全局的
+	+ i：大小写不敏感
+	+ m：多行
++ 正则表达式分组
+	+ 捕获型：包围在圆括号中的正则表达式分支，任何匹配这个分组的字符都会被捕获
+	+ 非捕获型：有一个(?:前缀，非捕获分组仅做简单的匹配，并不会捕获所匹配的文本
++ 需要被转义的特殊字符：`- / [ \ ] ^`
++ 数组相关方法
+	+ concat：合并两个数组 *`(浅拷贝)`*
+	+ join：通过特定分隔符把一个数组连接成一个字符串，默认的分隔符是逗号`,`
+	+ reverse：反转数组里的元素顺序，并返回数组本身
+	+ shift：移除数组中的第一个元素并返回该元素
+	+ unshift：把元素插入到数组的开始部分
+	+ slice：从start下标位置开始复制end位数组元素 *`浅拷贝`*
+	+ splice：从开始下标位置移除deleteCount个元素，并用新的item代替它们。返回一个包含被删除元素的数组
++ Number相关方法
+	+ number.toExponential(fractionDigits):把number转换成一个指数形式的字符串，可选参数fractionDigits控制其小数点后的数字位数。`(Math.PI.toExponential(0);//输出：3e+0)`
+	+ number.toFixed(fractionDigits)：把number转换成一个十进制形式的字符串，参数控制其小数点的数字位数。`(Math.PI.toFixed(0));//输出：3`
+	+ number.toPrecision(precision)：把number转换成一个十进制数形式的字符串，可选参数precision控制数字的精度。`(Math.PI.toPrecision(2));//输出：3.1`
+	+ number.toString(radix)：把number转换成一个字符串，可选参数radix控制基数，默认为10
++ String相关方法
+	+ charAt：返回在string中pos位置处的字符
+	+ charCodeAt：返回在string中pos位置处的字符的整数形式的字符码位
+	+ localeCompare：比较两个字符串
+	+ replace(searchValue,replaceValue)：对string进行查找和替换操作，返回一个新的字符串。
+	
+		```
+		//如果searchValue是一个正则表达式并且带有g标志，它会替换所有的匹配。如果没有带g标志，它仅会替换第一个匹配
+	var result = 'mother_in_law'.replace('_','-');//输出结果：mother-in_law
+		```
+	+ search：接受一个正则表达式对象作为参数而不是一个字符串，如果找到匹配，则返回第一个匹配的首字符位置，如果没有找到匹配，则返回－1。`次方法会忽略g标识`
+	+ slice/substring：slice能处理负参数,substring不能
+	+ String.fromCharCode：根据一串数字编码返回一个字符串
