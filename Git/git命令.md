@@ -39,9 +39,14 @@
 + `git push --force <远程主机名>`:强制推送，可能会造成某些内容被覆盖。谨慎使用
 + `git push <远程主机名> --tags:`向远程主机推送更新，并打上标签
 
+###删除分支
++ 删除远程分支：`git push origin :branch-name`//冒号前空格不能省略，原理是把一个空分支push到server上
++ 删除本地分支：`git branch -D branch-name`
+
 ##Git 暂存区
 ---
 + `git add file`：添加文件到暂存区
 + `git reset HEAD file`：取消文件暂存
 + `git checkout -- file`：撤消文件修改（*操作的文件修改小时并且不能恢复*）
 + `HEAD`文件指向master，master执行当前分支
+
