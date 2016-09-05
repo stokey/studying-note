@@ -126,3 +126,34 @@ dependencies {
 	+ applicationId：包名
 	+ shrinkResources：移除未使用的资源
 	+ multiDexEnabled：支持多Dex
+	+ applicationVariants：定义BuildConfig值和res值
+	
+	```
+applicationVariants.all{variant -> 
+variant.buildCobfigField "int", "VALUE", "1"
+variant.resValue "string","name","value"
+}
+	```
++ defaultConfig:
+	+ applicationId
+	+ minSdkVersion
+	+ targetSdkVersion
+	+ versionCode
+	+ versionName
+	+ multiDexEnabled
+	+ manifestPlaceholders:Manifest文件内容占位符
+	
+	```
+//可以在defaultConfig/buildType/productFlavors中配置
+defaultConfig{
+	manifestPlaceholders = [UMENG_CHANNEL:"defaultName"]
+	//在Manifest文件中直接使用${UMENG_CHANNEL}
+}
+	```
++ 获取git所在分支信息
+
+	```
+def gitBranch(){
+	return 'git symbolic-ref --short HEAD'.execute().text.trim();
+}
+	```
