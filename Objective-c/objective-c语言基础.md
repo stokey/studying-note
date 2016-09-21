@@ -22,3 +22,19 @@
 	+ `@implementation`：用于描述数据，并实现在接口中声明的方法的实际代码
 	+ `program`：具体调用
 + `-`负号开头表示是一个实例方法，`+`正号表示一个类方法
++ `*`表明一个对象的引用（或指针）
++ `new`方法可以将`alloc`和`init`操作结合起来
+
+	```
+Fraction *fraction = [[Fraction alloc] init];
+//等价于
+Fraction *fraction = [Fraction new];
+	```
++ 数据类型：
+	+ 基本数据类型
+		+ float (`显示浮点数需要用NSLog转换字符%f或者%g`)
+		+ int (`NSLog  %i`)
+		+ char (`NSLog  %c`)
+		+ double
+	+ id数据类型：`可以存储任何类型的对象，一般对象类型`
++ 数据类型转换：支持隐性类型转换＋强制类型转换
