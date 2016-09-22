@@ -37,4 +37,7 @@ Fraction *fraction = [Fraction new];
 		+ char (`NSLog  %c`)
 		+ double
 	+ id数据类型：`可以存储任何类型的对象，一般对象类型`
+	+ Boolean类型：`Bool`
 + 数据类型转换：支持隐性类型转换＋强制类型转换
++ condition ? : expression == condition ? condition : expression
++ OC类的声明一般放在名为class.h的文件中(`@interface`)，而类的定义通常放在相同名称的.m文件中（`@implementation`）{`oc 类 @interface`}
