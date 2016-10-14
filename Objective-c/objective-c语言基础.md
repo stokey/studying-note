@@ -71,7 +71,7 @@ Fraction *fraction = [Fraction new];
 	
 + 在实现部分声明和`synthesize`的实例变量是私有的，子类不能直接访问
 + `@class`指令引入类名，但是无法引用类相关方法
-+ float 类型不是一个精确的值：`float x =201.10 //可能为201.100002342`。如何比较值？？？？
++ float 类型不是一个精确的值：`float x =201.10 //可能为201.100002342`。如何比较值？？？？{`用CGFloat代替float`}
 
 + `@try{} @catch(e){}`捕获异常
 + `@instancetype`特殊类型：`-(instancetype) init(){...}`
