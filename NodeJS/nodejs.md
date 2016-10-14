@@ -97,3 +97,39 @@
 		+ 与字符串的相互转换：`var str = bin.toString('utf-8); var bin = new Buffer('hello','utf-8');`
 		+ Buffer与字符串的区别：字符串是只读的，Buffer更像是可以做指针操作的C语言数组`［Buffer.slice方法返回的不是一个新的Buffer，而更像是返回了指向原Buffer中间的某个位置指针，因此对.slice方法返回的Buffer的修改会作用于原Buffer。因此要想拷贝一份Buffer，得首先创建一个新的Buffer，然后通过.copy方法把原Buffer中的数据复制过去］`
 	+ Stream: `Stream基于事件机制工作，所有Stream的实例都继承于NodeJS提供的EventEmitter` 
+	+ 文本编码
+		+ BOM字符：用于标记文本文件使用的Unicode编码，其本身是一个Unicode字符（`\uFEFF`）。BOM字符本身不属于文本内容的一部分。
+		
+		```
+		//在不同的Unicode编码下，BOM字符对应的二进制字节
+		Bytes         Encoding
+		----------------------
+		FE EF         UTF16BE
+		FF FE         UTF16LE
+		EF BB BF       UTF8
+		```
+		
+		识别和去除UTF8 BOM的功能
+		
+		```
+		function readText(pathName){
+			var bin = fs.readFileSync(pathName);
+			if(bin[0]===0xEF && bin[1]===0xBB && bin[2]===0xBF){
+				bin = bin.slice(3);
+			}
+			return bin.toString('utf-8');
+		}
+		```
+		
+		+ 单字节编码（binary）：都以单字节编码保存数据，能够避免大于0xEF的单个字节编码应编码格式不同造成的乱码。
+		
+		```
+		function replace(pathname){
+			var str = fs.readFileSync(pathname,'binary');
+			str = str.replace('foo','bar');
+			fs.writeFileSync(pathname,str,'binary');
+		}
+		```
++ #### 网络操作（`Linux系统监听1024以下端口需要root权限`）
+	+ `http`模块即可以当作HTTP服务器监听HTTP客户端的请求返回响应，也可以当作客户端使用，发起一个HTTP客户端请求，获取服务端响应
+	+ 
