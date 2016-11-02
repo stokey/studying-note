@@ -89,5 +89,68 @@ getApplicationContext()方法获取的是整个App的Context
  				+ startScroll开启模拟过程
  		+ 属性动画
  		+ ViewDragHelper：基本可以实现各种不同的滑动、拖放需求
+ 			+ 初始化ViewDragHelper(`mViewDragHelper = ViewDragHelper.create(this,callback)`)
+ 			+ 拦截事件：重写拦截事件，将事件传递给ViewDragHelper进行处理
+ 	
+			 	```
+			 	@Override
+			 	public boolean onInterceptTouchEvent(MotionEvent ev){
+			 		return mViewDragHelper.shouldInterceptTouchEvent(ev);
+			 	}
+			 	@Overried
+			 	public boolean onTouchEvent(MotionEvent event){
+			 		mViewDragHelper.proccessTouchEvent(event);
+			 		return true;
+			 	}
+			 	``` 
+	  		+ 处理computeScroll()
+	  			
+	  			```
+	  			@Override
+	  			public void computeScroll(){
+	  				if(mViewDragHelper.continueSetting(true)){
+	  					ViewCompat.postInvalidateOnAnimation(this);
+	  				}
+	  			}
+	  			```
+ 			+ 处理回调Callback
  
  Google在其support库中提供了DrawerLayout和SlidingPaneLayout两个布局来帮助开发者实现侧边栏滑动的效果。
+ 
+ + Android绘图机制
+ 	+ Android XML绘图
+ 		+ Bitmap
+ 			
+ 			```
+ 			<?xml version="1.0" encoding="utf-8">
+ 			<bitmap 
+ 				xmlns:android="http://schemas.android.com/apk/res/android"
+ 				android:src="@drawable/ic_launcher"/>
+ 			```
+ 		+ Shape
+ 			+ corners：当shape为rectangle时使用
+ 			+ gradient：渐变
+ 			+ padding
+ 			+ size：指定大小，一般用在imageView配合scaleType属性使用
+ 			+ solid：填充颜色
+ 			+ stroke：指定边框 
+ 		+ Layer：图层效果
+ 			
+ 			```
+ 			<?xml version="1.0" encoding="utf-8">
+ 			<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+ 			<item android drawable="@drawable/ic_launcher"/>
+ 			<item android drawable="@drawable/ic_launcher"
+ 				    android:left="10dp"
+ 				    android:top="10dp"/>
+ 			</layer-list>
+ 			``` 
+ 		+ Selector：实现静态绘图中的事件反馈
+ 	+ Canvas
+ 		+ Canvas.save：保存画布，将之前的所有已绘制图像保存起来，让后续的操作就像在一个新图层上操作一样
+ 		+ Canvas.restore：将已保存的所有图像进行合并
+ 		+ Canvas.translate：坐标系平移
+ 		+ Canvas.rotate ：坐标系旋转
+ 	+ Layer：基于栈的结构进行管理
+ 		+ saveLayer/saveLayerAlpha将一个图层入栈（生成一个新的图层）
+ 		+ restore/restoreToCount将一个图层出栈	 
