@@ -27,7 +27,7 @@
 
 
 ###Git建立追踪关系：
-+ `git branch --set-upstream <本地分支> <远程主机名/远程分支名>`
++ `git branch --set-upstream-to <本地分支> <远程主机名/远程分支名>`
 + `git pull -p / git fetch -p`
 	
 	*远程分支本删除后要求本地分支与远程分支保持一致（即同时删除被删除的分支）*

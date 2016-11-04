@@ -154,3 +154,36 @@ getApplicationContext()方法获取的是整个App的Context
  	+ Layer：基于栈的结构进行管理
  		+ saveLayer/saveLayerAlpha将一个图层入栈（生成一个新的图层）
  		+ restore/restoreToCount将一个图层出栈	 
+	+ SurfaceView与View之间的区别（16ms，`如果自定的View需要频繁刷新，或者刷新时数据处理量比较大时应该使用SurfaceView代替View`）
+		+ View主要适用于主动更新的情况下，而SurfaceView主要适用于被动更新（`例如频繁刷新`）
+		+ View在主线程中对画面进行刷新，而SurfaceView通常会通过一个子线程来进行页面刷新
+		+ View在绘图时没有使用双缓冲机制，而SurfaceView在底层实现机制中实现了双缓冲机制
+
+
+
++ Android 动画
+	+ 视图动画：每次绘制视图时View所在的ViewGroup中的drawChild函数获取该View的Animation的Transformation值，然后调用canvas.concat(transformToApply.getMatrix())，通过矩阵运算完成动画帧。
+		+ AlphaAnimation
+		+ RotateAnimation
+		+ TranslateAnimation
+		+ ScaleAnimation
+	(`AnimationSet将动画以组合的形式展现出来`) 
+	+ 属性动画 ：（`解决Android 3.0之前动画框架存在的局限——动画之改变显示不能响应事件`）
+		+ ObjectAnimator
+			+ 自动驱动
+			+ 可以通过调用setFrameDelay(longframeDelay)设置动画帧之间的间隙时间，调整帧率，减少资源消耗
+			+  通过调用属性的get、set方法来真实地控制一个View的属性
+				+  translationX/translationY
+				+  rotation/rotationX/rotationY
+				+  scaleX/scaleY：
+				+  pivotX/pivotY：中心点位置
+				+  x/y：最终位置
+				+  alpha
+			+ 没有get、set方法的属性
+				+ 自定义一个属性类或者包装类，间接的给所需属性增加get、set方法
+				+ 通过ValueAnimator类来实现
+		+ PropertyValuesHolder：类似视图动画中的AnimationSet。通过ObjectAnimator.ofPropertyValuesHolder(view,pvh1,pvh2,pvh3)实现多个属性动画的共同作用 
+		+ AnimatorSet：能实现多个属性动画效果，同时能够精确控制执行顺序
+	+ 布局动画：作用在ViewGroup上（`geiViewGroup增加View时添加一个动画过渡效果`）
+		+ 通过在ViewGroup的XML中，添加`android:animateLayoutChanges="true"`属性打开默认动画效果(`逐渐显示的过渡效果`) 
+		+ 通过LayoutAnimationController类自定义子View的过渡效果
