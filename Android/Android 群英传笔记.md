@@ -187,3 +187,30 @@ getApplicationContext()方法获取的是整个App的Context
 	+ 布局动画：作用在ViewGroup上（`geiViewGroup增加View时添加一个动画过渡效果`）
 		+ 通过在ViewGroup的XML中，添加`android:animateLayoutChanges="true"`属性打开默认动画效果(`逐渐显示的过渡效果`) 
 		+ 通过LayoutAnimationController类自定义子View的过渡效果
+	+ 自定义动画：实现applyTransformation逻辑+覆盖父类的initialize方法
+	+ SVG动画
++ Activity栈
+	+ LaunchMode
+		+ Standard
+		+ SingleTop
+		+ SingleTask
+		+ SingleInstance  
+	+ IntentFlag
+		+ FLAG_ACTIVITY_NEW_TASK
+		+ FLAG_ACTIVITY_SINGLE_TOP
+		+ FLAG_ACTIVITY_CLEAR_TOP
+		+ FLAG_ACTIVITY_NO_HISTORY
+	+ 清空任务栈
+		+ clearTaskOnLaunch
+		+ finishOnTaskLaunch
+		+ alwaysRetainTaskState
++ Android系统信息获取
+	+ android.os.Build：包含了系统编译时的大量设备、配置信息
+	+ SystemProperty：包含了许多系统配置属性值和参数
++ Android APK应用信息获取
+	+ PackageManager：管理所有已安装的APP
+	+ ActivtyInfo：整个Activity信息，封装了在Manifest文件中<activity></activity>和<receiver></receiver>之间的所有信息，包括name、icon、lable、launchmode等 
+	+ ServiceInfo：封装了<service></service>之间的所有信息
+	+ ApplicationInfo：封装了<application></application>之间的信息。ApplicationInfo包含了很多FLAG，FLAG_SYSTEM表示为系统应用，FLAG_EXTERNAL_STORAGE 表示为安装在SDCard上的应用等
+	+ PackageInfo： 包含了所有Activity、Service等信息。整个Manifest信息
+	+ ResolveInfo：封装的是包含<intent>信息的上一级信息，所以它可以放回ActivityInfo、ServiceInfo等包含<intent>的信息

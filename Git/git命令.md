@@ -3,7 +3,7 @@
 + `git remote`:远程主机
 + `git remote -v`:查看远程主机网址
 + `git remote show`:查看远程主机的详细信息
-+ `git clone -o testBranch xxxxx`:修改远程主机名称（默认origin）
++ `git clone -o testBranch xx-url`:修改远程主机名称（默认origin）
 
 + `git remote add <主机名，网址>`:手动添加远程主机
 + `git remote rm <主机名>`:删除远程主机
