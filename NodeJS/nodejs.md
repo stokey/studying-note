@@ -242,3 +242,16 @@
 + #### Chrome调制NodeJS
 	+ 安装nightly build:`npm install -g node-nightly ====> node-nightly`
 	+ 使用`--inspect`标志来运行NodeJS代码：`node-nightly --inspect index.js //或者使用--debug-brk 标记让代码在运行到第一行时就停住`
+
++ #### 子进程
++ 创建子进程：[`child_process模块`]
+	+ .spawn()
+	+ .exec()/.execFile()：`额外提供了回调，当子进程停止的时候执行。底层通过.spawn()实现`
+	+ .fork()：`底层通过.spawn()实现` 
++ .exec()/.execFile()区别：`.execFile()没有创建新的shell，比.exce()效率高，不支持I/O重定向，文件glob等操作。exce() —> exceFile() —> spawn()` 
++ .execFile()：如果没有设置`{shell:'/bin/bash'}`，则spawn内部对命令的解析会有所不同
++ .fork()：`silent：默认为false，即子进程stdio从父进程继承。如果是true，则直接pipe向子进程的child.stdin/child.stdout等。如果声明了stdio，则会覆盖silent选项的设置`
++ 通过`child.unref()`将子进程从父进程的事件的循环中剔除，从而让父进程退出正常退出
+	+ 调用`child.unref()`
+	+ 设置detached为true
+	+ 设置stdio为`ignore` 
