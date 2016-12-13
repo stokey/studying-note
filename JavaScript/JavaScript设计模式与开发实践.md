@@ -113,3 +113,32 @@ var timeChunk = function (ary, fn, count) {
 ```
 
 + 惰性加载函数：避免重复的函数调用[`第一次进入条件分支之后，在函数内部会重写这个函数`]
+
+
++ 降低全局变量带来的命名污染
+	+ 使用命名空间
+	
+	```
+	var namespace = {
+		a: function() {
+			alert(1);
+		},
+		b: function() {
+			alert(2);
+		}
+	};
+	```
+	+ 使用闭包封装私有变量
+	
+	```
+	var user = (function() {
+		var _name = 'sven',
+			_age = 23;
+		return {
+			getUserInfo: function() {
+				return _name + '-' + _age;
+			}
+		}
+	})();
+	``` 
++ 策略模式：`定义一系列的算法，把它们一个个封装起来，使之可以互相替换`
