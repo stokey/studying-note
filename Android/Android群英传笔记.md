@@ -79,7 +79,7 @@ getApplicationContext()方法获取的是整个App的Context
  		+ layout方法：通过在ACTION_MOVE事件获取移动偏移量，再通过layout方法设置显示位置(`layout(getLeft()+offsetX,getTop()+offsetY,getRight()+offsetX,getBottom()+offsetY);`)
  		+  offsetLeftAndRight/offsetTopAndBottom方法：方法原理同layout方法
  		+  LayoutParams：通过getLayoutParams()获取LayoutParmas对象修改布局参数到达改变View位置的效果（`必须知道父布局类型`），或者通过使用ViewGroup.MarginLayoutParams来实现相应效果（`无需知道父布局类型`）
- 		+  scrollTo/scrollBy：移动的是View的content（`ViewGroup移动的是所有的子View`）
+ 		+  scrollTo/scrollBy：移动的是View的content（`ViewGroup移动的是所有的子View`）[`移动过程瞬间完成，滑动显得十分突兀`]
  			+ scrollTo(x,y)：表示移动到一个具体的坐标点(x,y)
  			+ scrollBy(dx,dy)：表示移动的增量dx、dy 
  		+  Scroller类：可以实现平滑移动的效果，而不是瞬间完成的移动
@@ -92,7 +92,7 @@ getApplicationContext()方法获取的是整个App的Context
  			+ 初始化ViewDragHelper(`mViewDragHelper = ViewDragHelper.create(this,callback)`)
  			+ 拦截事件：重写拦截事件，将事件传递给ViewDragHelper进行处理
  	
-			 	```
+			 	```java
 			 	@Override
 			 	public boolean onInterceptTouchEvent(MotionEvent ev){
 			 		return mViewDragHelper.shouldInterceptTouchEvent(ev);
@@ -105,7 +105,7 @@ getApplicationContext()方法获取的是整个App的Context
 			 	``` 
 	  		+ 处理computeScroll()
 	  			
-	  			```
+	  			```java
 	  			@Override
 	  			public void computeScroll(){
 	  				if(mViewDragHelper.continueSetting(true)){
@@ -121,7 +121,7 @@ getApplicationContext()方法获取的是整个App的Context
  	+ Android XML绘图
  		+ Bitmap
  			
- 			```
+ 			```xml
  			<?xml version="1.0" encoding="utf-8">
  			<bitmap 
  				xmlns:android="http://schemas.android.com/apk/res/android"
@@ -136,7 +136,7 @@ getApplicationContext()方法获取的是整个App的Context
  			+ stroke：指定边框 
  		+ Layer：图层效果
  			
- 			```
+ 			```xml
  			<?xml version="1.0" encoding="utf-8">
  			<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
  			<item android drawable="@drawable/ic_launcher"/>
