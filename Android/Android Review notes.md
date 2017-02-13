@@ -2,6 +2,7 @@
 ---
 
 - `View绘制流程`
+- `DecorView`
 - `IPC通信`
 - `IntentService/Service`
 	- IntentService是Service子类，创建独立的工作线程来异步处理请求。所有Intent请求处理完成后，系统会自动关闭服务，不需要调用stopSelft()来结束服务
@@ -48,8 +49,52 @@
 		- 普通广播：完全异步，可在同一时刻被所有接受者接收。同一级别接收先后顺序是随机的。消息传递的效率比较高，无法中断广播的传播。sendBroadCast()
 		- 有序广播 ：sendOrderBroadCast()
 
+- Android异步任务机制
+	- Handler
+	- AsyncTask
+		- AsyncTask内部的Handler需要和主线程交互，所以AsyncTask实例必须在UI线程中创建
+		- AsyncTaskResult的doInBackground()方法执行异步任务运行在子线程中，其他方法运行在主线程中
+		- 一个AsyncTask任务只能执行一次
+		- 默认的AsyncTask不一定会立即执行任务
+- Android启动过程图解
+	- 从开机到桌面过程：Bootloader ===> Kernel ===> Init进程 ===> Zygote进程 ===> SystemServer ===> ServiceManager ===>Home Launcher  
+	- 图解
+	![img](./images/launch_process.png)
+- 自定义View
+	- 需要重写的方法 
+		- onDraw：具体的视图都需要覆写该函数来实现自己的绘制。对于ViewGroup则不需要实现该函数，因为作为容器是“没有内容”的（但必须实现dispatchDraw()函数，告诉子View绘制自己）
+		- onLayout：主要是为ViewGroup类型布局子视图用的，在View中这个函数为空函数
+		- onMeasure：用于计算视图大小（长和宽）的方式，并通过setMeasuredDimension(width,height)保存计算结果
+		- onTouchEvent：定义触屏事件来响应用户操作
+		- 不常用方法
+			- onKeyDown/onKeyUp：当松开某个键盘按键时
+			- onTrackballEvent：当发生轨迹球事件时
+			- onSizeChange：当该组件的大小被改变时
+			- onFinishInflate：当应用从XML加载该组件并用它构建界面之后调用的方法
+			- onWindowFocusChanged：当组件得到、失去焦点时
+			- onAttachedToWindow：当把该组件放入到某个窗口时
+			- onDetachedFromWindow：当把该组件从某个窗口上分离时触发的方法
+			- onWindowVisibilityChanged：当该组件的窗口的可见性发生改变时触发  
+	- `调用requestLayout()方法时会触发measure和layout过程，调用invalidate会执行draw过程`
+	- 三种自定义控件方式
+		- 继承已有的控件
+		- 继承一个布局文件
+			- 在构建函数中通过inflater和addView方法加载自定义控件的布局文件形成图形界面（不需要onDraw方法） 
+		- 继承View
+			- 通过onDraw方法绘制出组件界面  
+- Android缓存机制
+	- 内存缓存
+		- LruCache类 
+	-  磁盘缓存
+		- DiskLruCache类	  
+	-  文件缓存
+	-  数据库缓存
 
+	
+## Java知识点复习
+---
 
+- [多线程](http://www.importnew.com/12773.html)
 
 ----
 + [ ] Android基础知识复习
@@ -59,8 +104,6 @@
 + [ ] HTTP／HTTPS + TCP/IP复习
 + [ ] 数据结构
 + [ ] 基础算法
-
-----
 
 ## 网络知识
 ---
