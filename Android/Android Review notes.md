@@ -89,13 +89,103 @@
 		- DiskLruCache类	  
 	-  文件缓存
 	-  数据库缓存
+- Android View 事件分发机制
+	- dispatchTouchEvent：负责事件分发处理
+		- `return true`：表示该View内部消化所有事件
+		- `return false`：表示在本层不再继续进行分发，并交由上层控件的onTouchEvent方法进行消费（如果本层控件已经是Activity，那么事件将被系统消费或处理）
+		- `return super.dispatchTouchEvent(ev)`，事件将分发给本层的事件拦截`onInterceptTouchEvent`方法进行处理 
+	- onInterceptTouchEvent：负责事件拦截处理
+		- `return true`：表示将事件进行拦截。并将拦截到的事件交由本层控件的onTouchEvent进行处理
+		- `return false`：表示不对事件进行拦截。事件得以成功分发到子View。并由子View的dispatchTouchEvent进行处理
+		- `return super.onInterceptTouchEvent(ev)`：默认表示拦截该事件，并将事件传递给当前View的onTouchEvent方法
+	- onTouchEvent：处理触控事件
+		- `return true`：表示onTouchEvent处理完事件后消费了此次事件。此时事件终止
+		- `return false`：表示不响应事件，该事件将会不断向上层View的onTouchEvent方法传递，知道某个View的onTouchEvent方法返回`true`
+		- `return super.dispatchTouchEvent(ev)` ：表示不响应事件，结果与`return false`一样。 
+	- 子View可以通过调用`getParent().requestDisallowInterceptTouchEvent(true)`阻止ViewGroup对其`MOVE`或者`UP`事件进行拦截
+	- 点击事件产生之后，传递过程：Activity ===> Window ===> View。顶级View接收到事件之后，就会按相应规则去分发事件。
+	- ViewGroup默认不拦截任何事件
+- SQLite
+	- ACID事物
+		- 原子性(Atomicity)
+		- 一致性(Consistency)
+		- 隔离性(Isolation)
+		- 持久性(Durability)   
+- Android三种菜单
+	- 选项菜单`Options Menus`
+		- 重写onCreateOptionsMenu用以创建上下文菜单
+		- 重写onOptionsItemSelected用以响应上下文菜单 
+	- 上下文菜单`Context Menus`
+		- 重写onCreateContextMenu用以创建上下文菜单
+		- 重写onContextItemSelected用以响应上下文菜单 
+	- 弹出式菜单`Popup Menus` ：依赖于Activity中的某个视图 
+- Android游戏开发中常用的三种视图
+	- View：显示视图，内置画布，提供图形绘制函数、触屏事件、按键事件函数等。必须在UI主线程内更新画面，速度较慢
+	- SurfaceView：基于View视图进行拓展的视图类，更适合2D游戏开发，是View的子类。类似使用双缓机制，在新的线程中更新画面所以刷新界面速度比View快
+	- GLSurfaceView：基于SurfaceView视图再次进行拓展的视图类，专用于3D游戏开发的视图，OpenGL专用
+		- 管理一个surface，这个surface就是一块特殊的内存，能直接排版到android的视图View上
+		- 管理一个EGL display，能上OpenGL把内容渲染到上述surface上
+		- 用户可自定义渲染器
+		- 让渲染器在独立的线程里运行，和UI线程分离，渲染效果和速度更好
+		- 支持按需渲染和持续渲染
+		- 能够支持某些工具：调试
+- `res/raw`和`assets`异同
+	- 相同点：两者目录下的文件在打包后会原封不动的保存在apk包中，不会被编译成二进制
+	- 差异点
+		- `res/raw`中的文件会被影射到R.java文件中，访问时直接使用资源ID即可
+		- `assets`文件夹中的文件不会被影射到R.java文件中，访问的时候需要AssetManager类
+- 简述JNI调用过程
+	- 安装和下载Cygwin,下载Android NDK
+	- 在NDK项目中设计JNI接口
+	- 使用C/C++实现本地方法
+	- JNI生成动态链接库
+	- 将动态链接库复制到Java工程，在Java工程中调用
+- Android程序运行时权限与文件系统权限的区别
+	- 运行时权限Dalvik（android授权）
+	- 文件系统权限（Linux 内核授权）          	
 
-	
 ## Java知识点复习
 ---
 
 - [多线程](http://www.importnew.com/12773.html)
+- ArrayList/LinkedList/Vector区别
+	- ArrayList、Vector采用数组方式存储数据，索引数据快插入数据慢（`插入数据涉及数组元素移动的内存操作`）
+	- LinkedList使用双向链表实现存储，插入数据快索引数据慢
+	- Vector使用了synchronized方法，所以是线程安全的。性能则比ArrayList差
+- Collection
+	- List：有序的Collection
+ 		- ArrayList
+ 		- LinkedList
+ 		- Vector
+ 		- Stack  
+ 	- Set：一种不包含重复的元素的Collection。且最多有一个null元素  
 
+- Collection与Collections区别
+	- Collection是集合继承结构中的顶层接口
+	- Collections是提供了对集合进行操作的强大方法的工具类。包含有各种有关集合操作的静态多态方法。此类不能实例化  
+
+- Throwable继承关系图
+![img](./images/throwable_map.jpeg)
+	
+- HashTable和HashMap的区别
+	- HashTable
+		- 继承自Dictionary，实现Map接口
+		- 键、值都不能是空对象
+		- 多次访问，映射元素顺序相同
+		- 线程安全
+		- hash算法，Hashtable直接利用key本身的hash码来做验证
+		- 数据遍历方式Iterator(支持fast-fail)和Enumeration(不支持fast-fail)
+		- 缺省初始长度为11，内部都为抽象方法
+	- HashMap
+		- 继承自AbstractMap抽象类
+		- 键、值都可以是空对象
+		- 多次访问，映射元素顺序可能不同
+		- 非线程安全[`HashMap可以通过下面的语句进行同步：Map m = Collections.synchronizeMap(hashMap);`]
+		- 检测是否含有key时，HashMap内部需要将key的hash码重新计算一遍再检测
+		- 数据遍历方式Iterator(支持fast-fail)	
+		- 缺省初始长度为16，内部已经实现了Map所需要做的大部分工作
+			 
+	
 ----
 + [ ] Android基础知识复习
 + [ ] Java基础知识复习
