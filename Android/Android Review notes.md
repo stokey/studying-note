@@ -21,14 +21,14 @@
 		- onDestroy()
 		- onDetach()：当fragment正与activity接触关联时被调用  
 - `Activity taskAffinity/flags/task`
-	- `taskAffinity`：任务相关性，该参数标识了一个Activity所需的任务栈的名字。默认情况下，所有Activity所需的任务栈的名字为应用的包名。TaskAffinity属性主要与SingleTask启动模式活着allowTaskReparenting属性配对使用，在其他情况下没有意义 
+	- `taskAffinity`：任务相关性，该参数标识了一个Activity所需的任务栈的名字。默认情况下，所有Activity所需的任务栈的名字为应用的包名。TaskAffinity属性主要与SingleTask启动模式或者allowTaskReparenting属性配对使用，在其他情况下没有意义 
 		- 当TaskAffinity和singleTask启动模式配对使用的时候，它是具有该模式的Activity的当前任务栈的名字，待启动的Acitivity会运行在名字和TaskAffinity相同的任务栈中
 		- 当TaskAffinity与allowTaskReparenting结合时，情况比较复杂，会产生特殊效果。A==> B.C ==> Home ==> B ==> show B.C not B.main
 	- `Flags`
-		- FLAG_ACTIVITY_NEW_TASK：singleTask模式相同
-		- FLAG_ACITIVIYT_SINGLE_TOP：singleTop模式相同
-		- FLAG_ACTIVITY_CLEAR_TOP：此模式在launchMode中没有对应的属性值。如果要启动的activity已经在当前的task运行则不在启动新的实例，且所有在其上面的activity将被销毁
-		- FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS：具有这个标志的Activity不会出现在历史Activity列表中  
+		- FLAG_ ACTIVITY _  NEW _TASK：singleTask模式相同
+		- FLAG_ ACITIVIYT _ SINGLE _TOP：singleTop模式相同
+		- FLAG_ ACTIVITY _ CLEAR _TOP：此模式在launchMode中没有对应的属性值。如果要启动的activity已经在当前的task运行则不在启动新的实例，且所有在其上面的activity将被销毁
+		- FLAG_ ACTIVITY _ EXCLUDE _ FROM _RECENTS：具有这个标志的Activity不会出现在历史Activity列表中  
 - `Activity 启动模式`
 	- `standard`：默认启动模式。每次启动一个Activity都会重新创建一个新的实例。谁启动了这个Activity那么这个Activity就运行在启动的那个Activity所在的栈中。从而解释了ApplicationContext无法启动standard模式的Activity
 	- `singleTop`：栈顶复用模式。如果新Activity已经位于任务栈的栈顶，那么此Activity不会被重新创建，同时它的onNewIntent方法会被回调，onCreate、onStart方法不会被调用。
@@ -157,13 +157,12 @@
  		- ArrayList
  		- LinkedList
  		- Vector
- 		- Stack  
+ 			- Stack  
  	- Set：一种不包含重复的元素的Collection。且最多有一个null元素  
 
 - Collection与Collections区别
 	- Collection是集合继承结构中的顶层接口
 	- Collections是提供了对集合进行操作的强大方法的工具类。包含有各种有关集合操作的静态多态方法。此类不能实例化  
-
 - Throwable继承关系图
 ![img](./images/throwable_map.jpeg)
 	
@@ -184,11 +183,41 @@
 		- 检测是否含有key时，HashMap内部需要将key的hash码重新计算一遍再检测
 		- 数据遍历方式Iterator(支持fast-fail)	
 		- 缺省初始长度为16，内部已经实现了Map所需要做的大部分工作
-			 
+- HashCode：主要用于查找的快捷性
+	-   两个对象相同，即适用于equals(java.lang.Object)方法，那么这两个对象的hashCode一定要相同
+	-   如果对象的equals方法被重写，那么对象的hashCode也尽量重写。不能违反上面一条规则
+	-   两个对象的hashCode相同，并不表示两个对象就相同，即不一定适用于equals方法。`只能够说明两个对象在散列序列结构中，如Hashtable，他们“存放在同一个篮子里”`
+- Map/Set/List/Queue/Stack
+	- 键值对：`key`——`set`，`value`——`Collection` 
+	- Set：不包含重复元素的collection。不可随机访问包含的元素。只能用Iterator实现单向遍历。没有同步方法
+	- List：可随机访问包含的元素。元素有序，可在任意位置增、删元素，不管访问多少次，元素位置不变。允许重复元素。用Iterator实现单向遍历，用ListIterator实现双向遍历
+	- Queue：先进先出，尽量避免插入null元素（`null 也用作 poll 方法的一个特殊返回值，表明队列不包含元素`）。LinkedList实现了Queue接口，可以当作Queue使用
+	- Stack：后进先出，继承自Vector
+	- 用法 
+		- 如果涉及堆栈、队列等操作，应该考虑用List
+		- 如果需要快速插入、删除元素，应该考虑用LinkedList    
+		- 如果需要快速随机访问元素，应该考虑用ArrayList
+		- 如果程序在单线程环境中，或者访问仅仅在一个线程中进行，考虑非同步的类
+
+- ThreadLocal：线程局部变量
+- 接口／抽象类
+	- 接口并不是类，只有static/final变量和方法
+	- 接口无法实例化，没有构造函数，支持多重继承
+	- 接口是`隐式抽象`的，当声明一个接口和接口中方法的时候，不必使用abstract关键字。接口中的方法都是公有的(`public`)
+	- 一个接口能继承另一个接口，和类之间的继承方式比较相似 
+- 多线程锁
+	- 方法锁：`通过在方法声明中加入synchronized关键字来声明方法。`
+	- 对象锁：`当一个对象中有synchronized method或synchronized block的时候调用其对象的同步方法或进入其同步区域，就必须获得对象锁。对象锁用来控制实例方法之间的同步`
+	- 类锁：`synchronized修饰静态的方法或代码块。同来控制静态方法（或静态变量互斥体）之间的同步`
+- 引用
+	- 强引用：gc时不管内存是否紧张，都不会被回收
+	- 弱引用：gc时不管内存空间是否紧张，都会被回收
+	- 软引用：gc时在内存空间紧张的情况下会被回收，否则不回收
+	- 虚引用：没有引用。任何时候都可能会被回收。主要用来跟踪对象被垃圾回收器回收的活动    		 
 	
 ----
-+ [ ] Android基础知识复习
-+ [ ] Java基础知识复习
++ [ X ] Android基础知识复习
++ [ ]  Java基础知识复习
 + [ ] Android项目复习
 + [ ] RN知识点复习
 + [ ] HTTP／HTTPS + TCP/IP复习
@@ -350,3 +379,12 @@ function quickSort(arr) {
 	+ 最差空间复杂度：O(n*k) 
 + 基数排序
 + 插入排序
+
+### 树结构
+---
++ AVL数／哈夫曼树
+	+ AVL树：`任何节点的两个紫薯的高度最大差为1`。查找、插入和删除在平均和最坏情况下都是`O(log n)` 
+	+ 哈夫曼树：又称最优二叉树。是一种带权路径长度最短的二叉树
+		+ 哈夫曼编码：可变长编码。有时称之为最佳编码。主要应用在数据压缩，加密解密等场合
+	 
++ B／B-／B+树
