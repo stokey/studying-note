@@ -1,8 +1,7 @@
 ##HTTP协议
----
 ###概要
 ---
-- HTTP协议是机遇TCP／IP协议的应用层协议。
+- HTTP协议是基于TCP／IP协议的应用层协议。
 - 对于同一个域名，大多数浏览器允许同时建立6个持久连接
 - HTTP/1.0:GET/POST/HEAD，HTTP/1.1:PUT／OPTIONS／TRACE／CONNECT／DELETE，HTTP/1.1之后：PATCH
 - HTTP/2二进制协议，头信息和数据体都必须是二进制编码［头信息帧和数据帧］（1.1头信息肯定为文本（ASCII编码），数据体可以是文本也可以是二进制）
