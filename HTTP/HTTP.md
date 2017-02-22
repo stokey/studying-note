@@ -51,7 +51,7 @@
 
 ###HTTP消息结构
 ---
-+ #####Request消息的结构：三部分
++ ####Request消息的结构：三部分
 	1. 请求行(Request line)：包括http请求的种类，请求资源的路径，http协议版本［GET/hope/HTTP/1.1］
 	2. 请求头(http header)：http头部信息
 	
@@ -66,7 +66,7 @@
 	User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, 	like Gecko) Chrome/44.0.2403.130 Safari/537.36
 		```
 	3. 请求体(http body)
-+ #####Response消息的结构:三部分
++ ####Response消息的结构:三部分
 	1. 状态行 ［HTTP协议版本 响应状态码 状态码的文本描述］
 	
 		*状态码由三位数字组成：*
