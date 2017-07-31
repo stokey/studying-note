@@ -136,7 +136,64 @@
 	+ `Memory Monitor`：跟踪整个App的内存变化情况
 	+ `Heap Viewer`：查看当前内存快照，便于对比分析哪些对象可能发生了泄漏
 	+ `Allocation Tracker`：跟踪内存对象的来源 
++ 优化方向
+	+ 内存泄漏
+	+ 内存溢出
 
 ## 耗电优化
 
-## 稳定性优化
++ 耗电检测：`第三方检测电量设备——第三方硬件监测的时候用的是自己设备供电而不是手机的电量`
++ 手机耗电量较大的点
+	+ 唤醒屏幕
+	+  CPU唤醒使用
+	+  蜂窝式无线
++ Battery Historian：`电量数据收集工具（Android 5.0及以上设备，允许通过adb命令dump出电量使用统计信息）`
+	+ 操作流程
+		+ reset：`adb shell dumpsys batterystats --reset`
+		+ 断开测试设备，操作待测试App
+		+ 重新连接设备，使用adb命令导出相关统计数据：`adb bugreport > bugreport.txt // 此命令持续记录输出，想要停止记录时按Ctrl+C退出`
++ 电量优化方式
+	+ 计算、内存、渲染等优化
+	+ 监听手机充电状态：`USB／AC／WireLess`   
+	+ 屏幕唤醒
+		+ 保持屏幕常亮
+			+ Activity中使用FLAG_KEEP_SCREEN_ON的Flag
+			+ 布局文件中使用`android:keepScreenOn`属性  
+	+ WakeLock：`相对系统休眠而言，程序给CPU加上WakeLock后系统就不会休眠。对电池续航影响较大。一般用在使用后台服务在屏幕关闭情况下hold住CPU完成一些工作` 
+		+ 类型
+
+		|标记值| CPU | 屏幕 | 键盘|
+		| :--: | :--: | :--: | :--: |
+		|PARTIAL\_WAKE\_LOCK|开启|关闭|关闭
+		|SCREEN\_DIM\_WAKE\_LCOK|开启|变暗|关闭
+		|SCREEN\_BRIGHT\_WAKE\_LCOK|开启|变亮|关闭
+		|FULL\_WAKE\_LCOK——API17被弃用FLAG\_KEEP\_SCREEN\_ON|开启|变亮|变亮
+		
+	+ JobScheduler：`Android 5.0，执行后台工作首选方式`
+	+ GPS：`选择合适的Location Provider`
+		+ `GPS_PROVIDER`：GSP定位，耗电大，精度高（10m），在室内基本无效
+		+ `NETWORK_PROVIDER`：网络定位，定位精确度取决于将基站或WI-FI节点信息翻译成位置信息的服务器的能力
+		+ `PASSIVE_PROVIDER` ：被动定位。使用其他应用保留的定位信息
+	+ 传感器：`使用传感器时，选择合适的采样率，越高的采样率类型则越费电——后台时注意注销传感器监听`
+		+ `SENSOR_DELAY_NOMAL (200000微秒)`
+		+ `SENSOR_DELAY_UI (60000微秒)`  
+		+ `SENSOR_DELAY_GAME (20000微秒)`
+		+ `SENSOR_DELAY_FASTEST (0微秒)`
+
+##	数据库优化
+
++ 建立索引
+	+ 优点：`加速检索数据表的速度`
+	+ 缺点 
+		+ 对于增加、更新和删除来说，使用索引会变慢
+		+ 建立索引会增加数据库大小
+	+ 创建索引
+		+ `CREATE INDEX index_name ON table_name;`
+		+ `CREATE INDEX index_name ON table_name (column_name);`  
++ 编译SQL语句：`SQLite想要执行操作，需要将程序中sql语句变异成对应的SQLiteStatement。对于批量插入或者更新操作，使用显示编译来做到重用SQLiteStatement`  
+	+ 编译sql语句获得SQLiteStatement对象，参数使用？代替
+	+ 在循环中对SQLiteStatement对象进行具体数据绑定，bind方法中的index从1开始，而不是0
++ 显式使用事务
++ ContentValues的容量调整：`设置合理的初始化容量`
++ 及时关闭Cursor
++ 耗时异步化
