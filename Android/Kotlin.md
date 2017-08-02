@@ -153,7 +153,7 @@
 		}
 		```
 		
-		+ 次构造函数：`不在类头，用contructor关键字修饰的方法`
+		+ 次构造函数：`不在类头，用contructor关键字修饰的方法。如果类有一个构造函数，每个次构造函数需要委托给主构造函数`
 		
 		```kotlin
 		class Person {
@@ -161,5 +161,235 @@
 				parent.children.add(this)
 			}
 		}
+		// 如果一个非抽象类没有声明任何（主或次）构造函数，会有一个生成的不带参数的主构造函数，构造函数可见性是public。
+		// 非默认可见性的空主构造函数
+		class DontCreateMe private constructor() {
+		}
 		```
+	+ 类成员
+		+ 构造函数和初始化块
+		+ 函数
+		+ 属性
+		+ 嵌套类和内部类
+		+ 对象声明
+	+ 类继承：`kotlin所有类都有一个共同的超类Any --\-> Java Object，Any类除了equals()、hashCode()和toString()外没有任何成员`  
+
+	```kotlin
+	// open标注与Java中final相反，表示允许其他类从这个类继承。默认情况下，kotlin中所有的类都是final
+	open class Base(p:Int)
+	class Derived(p:Int) : Base(p)  
+	```
 	
+	+ 覆盖方法
+	
+	```kotlin
+	open class Base {
+		open fun v(){}
+		fun nv(){}
+	}
+	class Derived() : Base() {
+		// 标记为override的成员本身是开放的
+		override fun v(){}
+		// 禁止再次覆盖
+		final override fun v(){}
+	}
+	```
+	
+	+ 覆盖属性：`必须具有兼容类型，可以用一个var属性覆盖一个val属性，反之不行`
+	+ 调用超类实现
+		+ 派生类访问超类：`super`
+		
+		```kotlin
+		open class Foo {
+			open fun f(){ println("Foo.f()")}
+			open val x: Int get() = 1
+		}
+		class Bar : Foo() {
+			override fun f(){
+				super.f()
+				println("Bar.f()")
+			}
+			override val x: Int get() = super.x + 1
+		}
+		```
+		
+		+ 内部类访问外部类的超类：`super@Outer` 
+
+		```kotlin
+		class Bar: Foo(){
+			override fun f() { /* ...... */}
+			override val x: String get() = "..."
+			inner class Baz {
+				fun g(){
+					super@Bar.f()
+					println(super@Bar.x)
+				}
+			}
+		}
+		```
+		
+		+ 覆盖规则：类单继承
+		
+		```kotlin
+		open class A {
+    			open fun f(){print("A")}
+    			fun a() {print("a")}
+		}
+		
+		interface B {
+		    // 接口中成员默认为open
+		    fun f(){print("B")}
+		    fun b(){print("b")}
+		}
+		
+		class C(): A(),B{
+		    // 编译器要求覆盖f()
+		    override fun f() {
+		        super<B>.f()
+		        super<A>.f()
+		    }
+		    override fun b() {
+		        super.b()
+		    }
+		}
+		```
+		
+		+ 抽象类／属性：`abstract(默认open)——可以用一个抽象成员覆盖一个非抽象开放成员`
+		+ Kotlin类中没有静态方法——`包级函数`
+
++ 属性和字段
+	+ 修饰符
+		+ `var`：可变
+		+ `val` ：只读
+	+ Getter/Setter
+
+	```kotlin
+	var <propertyName>[: <PropertyType>] [= <property_initializer>]
+	[<getter>]
+	[<setter>]
+	// 只读属性不允许设置setter
+	val isEmpty: Boolean
+		get() = this.size == 0
+	
+	var stringReprentation: String 
+		get() = this.toString()
+		set(value) {
+			setDataFormString(value)
+		} 
+	```
+	
+	+ 幕后字段
+	+ 幕后属性
+
+	+ 编译期常量：`const修饰符标记`
+		+ 修饰的属性需要满足的条件
+			+ 位于顶层或object的一个成员
+			+ 用String或原生类型初始化
+			+ 没有自定义getter
+	+ 延迟初始化属性：`lateinit修饰符标记，只能用在类体中声明的var属性，并且仅当该属性没有自定义getter或setter，同事改属性必须是非空类型，且不能是原生类型`
+	
+	```kotlin
+	public class MyTest {
+		lateinit var subject : TestSubject
+		
+		@SetUp fun setup(){
+			subject = TestSubject()
+		}
+		@Test fun test(){
+			subject.method()
+		}
+	}
+	```   
+	
+	+ 覆盖属性
+	+ 委托属性
+
++ 接口
+	+ 定义/实现
+
+	```kotlin
+	interface MyInterface {
+		fun bar()
+		fun foo(){
+			// 可选方法体
+		}
+	}
+	
+	// 一个类或者对象可以实现一个或者多个接口
+	class Child : MyInterface {
+		override fun bar(){
+			// 方法体
+		}
+	}
+	``` 
+	
++ 可见性修饰符：`默认可见性为public` 
+	+ 包名
+		+ private：`声明它的文件内可见`
+		+ protected：`不适用于顶层声明`
+		+ internal：`在相同模块内随处可见`
+		+ public：`默认`
+	+ 类和接口：`Java相同`
+		+ internal：`能见到类声明的本模块内的任何客户端都可见`
+	+ `局部变量、函数和类不能有可见性修饰符` 
+	+ 模块（`internal——相同模块内可见`）：`编译在一起的一套Kotlin文件`
+
++  扩展：`扩展一个类的新功能而无需继承该类或使用像装饰者设计模式——支持扩展函数和扩展属性。扩展不能真正修改所扩展的类`
+	+ 扩展函数：`需要用一个接收者类型也就是被扩展的类型来作为他的前缀`
+
+	```kotlin
+	// 为MutableList<Int>添加一个swap函数
+	fun MutableList<Int>.swap(index1:Int, index2:Int){
+		val temp = this[index1]
+		this[index1] = this[index2]
+		this[index2] = temp
+	}
+	// 如果一个类定义有一个成员函数和一个扩展函数，且两个函数又有相同的接收者类型、相同的名字并且都适用给定的参数，这种情况总是取成员函数
+	class C {
+		fun foo() {println("member")}
+	}
+	fun C.foo(){println("extension")} // 输出member
+	```
+	
+	+ 扩展属性：`属性扩展不能有初始化器，只能显式提供getter/setter定义`
+	
+	```kotlin
+	val <T> List<T>.lastIndex: Int
+		get() = size -1
+	// errror
+	val Foo.bar = 1 //错误：扩展属性不能有初始化器
+	```
+
++ 数据类：`只保存数据的类，用data关键字标记`
+	+ 声明
+
+	```kotlin
+	data class User(val name:String, val age:Int)
+	```
+	
+	+ 要求
+		+ 主构造函数需要至少有一个参数
+		+ 主构造函数的所有参数需要标记为val或var
+		+ 数据类不能是抽象、开放、密封或内部的
+		+ JVM中，如果生成的类需要含有一个无参数的构造函数，则所有属性必须制定默认值
+		
+		```kotlin
+		data class User(val name:String = "",val age: Int =0)
+		``` 
+	+ 复制：`copy()——复制一个对象，然后改变某些属性，其余属性保持不变`
+
+	```kotlin
+	fun copy(name:String = this.name,age:Int=this.age) = User(name,age)
+	val jack = User(name="Jack",age=21)
+	val olderJack = jack.copy(age=22)
+	```
+	
+	+ 数据类和解构声明
+	
+	```kotlin
+	val jane = User("Jane",35)
+	val(name,age) = jane
+	println("$name,$age years of age")
+	```
+
++ 密封类：`sealed修饰符标记，限制类继承结构——所有子类都必须在与密封类自身相同的文件中声明`
