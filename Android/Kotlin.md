@@ -393,3 +393,215 @@
 	```
 
 + 密封类：`sealed修饰符标记，限制类继承结构——所有子类都必须在与密封类自身相同的文件中声明`
+
++ 范型
+
++ 枚举类
+	+ 创建
+	
+	```kotlin
+	// 每个枚举常量都是一个对象，用分号将成员分开
+	enum class Direction {
+		NORTH,SOUTH,WEST,EASE
+	}
+	// 每一个枚举都是枚举类的实例
+	enum class Color(val rgb: Int){
+		RED(0xFF0000),
+		BLUE(0x0000FF)
+	}
+	// 枚举常量能够声明自己的匿名类
+	enum class ProtocolState {
+		WAITING {
+			override fun signal() = TALKING
+		},
+		TALKING {
+			override fun signal() = WAITING
+		};
+		abstract fun signal(): ProtocolState
+	}
+	``` 
+	
+	+ 使用
+
+	```kotlin
+	// 通过名称获取枚举常量
+	enumValueOf<T>()
+	// 列出定义的枚举常量
+	enumValues<T>()
+	```
++ 对象
+	+ 对象表达式：`创建一个继承自某个烈性的匿名类的对象`
+
+	```kotlin
+	window.addMounseListener(object : MouseAdapter(){
+		override fun mouseClicked(e: MouseEvent){
+			// ...
+		}
+		override fun mouseEntered(e: MouseEvent){
+			/ ...
+		}
+	})
+	
+	val adHoc = object {
+		var x: Int = 0
+		var y: Int = 0
+	}
+	
+	// 如果使用匿名对象作为共有函数返回类型或者用作共有属性类型，那么该函数或属性的实际类型会是匿名对象声明的超类型，如果没有声明任何超类型，就会是Any，匿名对象中添加的成员将无法访问
+	class C{
+		// 私有函数，其返回类型为匿名对象类型
+		private fun foo() = object {
+			val x: String = "x"
+		}
+		
+		//公有函数，其返回类型是Any
+		fun publicFoo() = object {
+			val x: String = "x"
+		}
+		
+		fun bar() {
+			val x1 = foo().x //ok
+			val x2 = publicFoo().x //error，未能解析的引用“x”			
+		}
+	}
+	``` 
+
+	+ 伴生对象：`companion关键字标记——伴生对象成员可通过只使用类名作为限定符来调用`
+
+	```kotlin
+	// 伴生对象成员看起来像其他语言的静态成员，在运行时它们任然是真实对象的实例成员
+	class MyClass {
+		companion object Factory {
+			fun create() : MyClass = MyClass()
+		}
+	}
+	
+	val instance = MyClass.create()
+	
+	// 可以省略伴生对象的名称——使用名称Companion
+	class MyClass2{
+		companion object {}
+	}
+	
+	val x = MyClass2.Companion
+	
+	// 伴生对象可以实现接口
+	interface Factory<T> {
+		fun create(): T
+	}
+	
+	class MyClass3 {
+		companion object : Factory<MyClass3> {
+			override fun create(): MyClass3 = MyClass3()
+		}
+	}
+	```
+	
+	+ 对象表达式/对象声明
+		+ 对象表达式：使用的时候立即执行（及初始化）
+		+ 对象声明：第一次访问到时延迟初始化
+		+ 伴生对象：相应类被加载（解析）时被初始化
++ 委托：`关键字by标志`
+	+ 类委托
+
+	```kotlin
+	interface Base {
+		fun print()
+	}
+	class BaseImpl(val x: Int) : Base {
+		override fun print() {print(x)}
+	}
+	
+	// b将会在Derived中内部存储，并且编译器将生成转发给b的所有Base的方法
+	class Derived(b : Base) : Base by b
+	
+	fun main(args: Array<String>){
+		val b = BaseImpl(10)
+		Dervied(b).print() //输出10
+	}
+	```  
+	
+	+ 委托属性
+		+ 解决问题
+			+ 延迟属性（Lazy Properties）：其值只有在首次访问时计算
+			+ 可观察属性（Observable Properties）：监听器会收到有关此属性变更的通知
+			+ 把多个属性存储在一个映射中，而不是每个存在单独的字段中
+		+ 语法：`val/var <属性名>: <类型> by <表达式——委托>`
+		+ 表示
+		
+		```kotlin
+		// 属性对应的get()/set()会被委托给它的getValue()和setValue()方法方法。属性的委托不需要实现任何接口，只需要提供一个getValue()函数（和setValue()——对应于var属性）
+		class Delegate {
+			operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
+				return "$thisRef, thank you for delegating '${proptery.name}' to me!"
+			}
+			operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String){
+				println("$value has been assigned to '${property.name}' in $thisRef.")
+			}
+		}
+		
+		class Example {
+			var p: String by Delegate()
+		}
+		val e = Example()
+		println(e.p) //输出：Example@33a17727, thank you for delegating ‘p’ to me!
+		e.p = "NEW" //输出：NEW has been assigned to ‘p’ in Example@33a17727.
+		```
+	
+	+ 标准委托
+		+ 延迟属性：`lazy`
+
+		```kotlin
+		val lazyValue: String by lazy {
+			println("computed!")
+			"Hello"
+		}
+		/* 
+			输出:
+			computed!
+			Hello
+			Hello
+		*/
+		fun main(args: Array<String>){
+			println(lazyValue)
+			println(lazyValue)
+		}
+		```
+
+		+ 可观察属性：`Delegates.observable()——接收两个参数：初始值和修改时处理程序。每当给属性赋值时会调用该处理程序（在赋值后执行）—— 三个参数：被赋值的属性，旧值，新值`
+		
+		```kotlin
+		import kotlin.properties.Delegates
+		class User{
+			var name: String by Delegates.observable("<no name>"){
+				prop, od, new -> println("$old -> $new")
+			}
+		}
+		/*
+			输出：
+			<no name> -> first
+			first -> second
+		*/
+		fun main(args: Array<String>){
+			val user = User()
+			user.name = "first"
+			user.name = "second"
+		}
+		// 拦截一个赋值并“否决”——vetoable()取代observable()，在属性被赋新值生效之前会调用传递给vetoable的处理程序
+		```
+		
+	+ 属性储存在映射中
+	
+	```kotlin
+	class User(val map: Map<String,Any?>){
+		val name: String by map
+		val age: Int by map
+	}
+	val user = User(mapOf(
+		"name" to "Kotlin"
+		"age" to 25
+	))
+	// 也适用于var属性：Map -> Mut
+	```
+		
+		 
