@@ -547,7 +547,7 @@
 		println(e.p) //输出：Example@33a17727, thank you for delegating ‘p’ to me!
 		e.p = "NEW" //输出：NEW has been assigned to ‘p’ in Example@33a17727.
 		```
-	
+
 	+ 标准委托
 		+ 延迟属性：`lazy`
 
@@ -604,4 +604,67 @@
 	// 也适用于var属性：Map -> Mut
 	```
 		
-		 
++ 函数：`fun关键字标识`
+	+ 中缀表示法
+		+ 成员函数或扩展函数
+		+ 只有一个参数
+		+ 用`infix`关键字标识
+	
+	```kotlin
+	// 给Int定义扩展
+	infix fun Int.shl(x: Int): Int {
+		...
+	}
+	// 用中缀表示法调用扩展函数
+	1 shl 2 // 等同于 1.shl(2)
+	```	 
+	
+	+ 默认参数：函数参数设置默认值。覆盖一个带有默认参数值的方法时，必须从签名中省略默认参数值
+	
+	```kotlin
+	fun read(b: Array<Byte>, off: Int = 0, len: Int = b.size){
+		...
+	}
+	```
+	
+	+ 命名参数：Java函数不能使用命名参数语法，JS
+
+	```kotlin
+	reformat(str,
+    normalizeCase = true,
+    upperCaseFirstLetter = true,
+    divideByCamelHumps = false,
+    wordSeparator = '_'
+    )
+    // 函数调用
+	reformat(str, wordSeparator = '_')
+	```
+	
+	+ 返回Unit的函数：`函数不返回任何有用的值，则该函数返回类型是Unit，此时该值不需要显式返回`
+	+ 可变数量的参数：`修饰符vararg标识——函数参数（通常是最后一个）可以用该修饰符标记`
+	
+	```kotlin
+	fun <T> asList(vararg ts: T): List<T>{
+		val result = ArrayList<T>()
+		for(t in ts){
+			result.add(t)
+		}
+		return result
+	}
+	// 调用
+	val list = asList(1,2,3)
+	
+	// 伸展操作符*
+	val a = arrayOf(1,2,3)
+	val list2 = asList(-1,0,*a,4)
+	```
+	
+	+ 尾递归函数：`tailrec修饰符标记。目前只在JVM后端中支持`
+
+	```kotlin
+	// 无堆栈溢出风险
+	tailrec fun findFixPoint(x: Double = 1.0): Double = if (x == Math.cos(x)) x else findFixPoint(Math.cos(x)）
+	```
+	
++ 高阶函数/Lambda表达式
+	+ 高阶函数：`将函数用作参数或返回值的函数` 
