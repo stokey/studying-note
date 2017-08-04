@@ -668,3 +668,35 @@
 	
 + 高阶函数/Lambda表达式
 	+ 高阶函数：`将函数用作参数或返回值的函数` 
+
+	```kotlin
+	// 高阶函数
+	fun <T> lock(lock: Lock, body: () -> T) : T {
+		lock.lock()
+		try {
+			return body()
+		}
+		finally {
+			lock.unlock()
+		}
+	}
+	// kotlin约定，如果函数的最后一个参数是一个函数，并且传递一个lambda表达式作为相应参数，则可在圆括号之外指定它
+	lock(lock){
+		sharedResource.operation()
+	}
+	// lambda是该调用唯一参数时调用中的圆括号可以省略
+	val doubled = ints.map{ value -> value * 2 }
+	
+	// it：单个参数的隐式名称（函数字面值只有一个参数）
+	ints.map { it * 2 }
+	// 下划线用于未使用的变量
+	map.forEach{ _ , value -> println("$value!")}
+	```
+	
+	+ Lambda表达式
+		+ 语法
+		
+		```kotlin
+		// 等价于 val sum: (x: Int, y: Int) -> Int = x+y
+		val sum = {x: Int, y: Int -> x + y}
+		```	 
