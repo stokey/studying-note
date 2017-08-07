@@ -693,10 +693,118 @@
 	map.forEach{ _ , value -> println("$value!")}
 	```
 	
-	+ Lambda表达式
-		+ 语法
+	+ Lambda表达式：`缺乏指定返回值类型的能力`
+	
+	```kotlin
+	// 等价于 val sum: (x: Int, y: Int) -> Int = { x,y -> x+y }
+	val sum = {x: Int, y: Int -> x + y}
+	// 通过限定返回语法从lambda显示返回一个值
+	ints.filter{
+		val shouldFilter = it > 0
+		shouldFilter
+	}
+	// 等价于
+	ints.filter{
+		val shouldFilter = it > 0
+		return @filter shouldFilter
+	}
+	```	 
+
+	+ 匿名函数：`可以指定返回值类型`
+
+	```kotlin
+	// 省略函数名称
+	fun (x:Int, y:Int): Int = x + y
+	// 等价于
+	fun (x:Int, y:Int): Int {
+		return x+y
+	}
+	// 调用
+	ints.filter(fun(itme) = item > 0)
+	```	
+	
+	+ 带接收者的函数字面值
+
+	```kotlin
+	// 匿名函数语法允许直接指定函数字面值的接受者类型
+	val sum  = fun Int.(other: Int) : Int = this + other
+	
+	// 调用
+	1.sum(2)
+	```
+	
++ 内联函数：`关键字inline标记——高阶函数优化`
+	+ 表示
+	
+	```kotlin
+	/*
+		调用某个函数实际上将程序执行顺序的转移到该函数所存放在内存中某个地址，将函数的程序内容执行完后，在返回到转去执行该函数原来执行的地方。这种转移操作要求在转去前保护现场并记录执行的地址，转回后先要恢复现场，并按原来保存地址继续执行。
+		内联函数就是在程序编译时，编译器将程序中出现的内联函数的调用表达式用内联函数的函数体来直接进行替换。不会出现转去转回问题。用空间换时间
+	*/
+	// inline修饰符影响函数本身和传给它的lambda表达式
+	inline fun lock<T>(lock: Lock, body: () -> T): T {
+		//...
+	}
+	// 禁止内联——noinline
+	inline fun foo(inlined:() -> Unit, noinline notInlined: () -> Unit){
+		// ...
+	}
+	```
+	
+	+ 非局部返回
+	
+	```kotlin
+	// lambda表达式内部禁止使用裸return，lambda表达式不能包含它的函数返回
+	fun foo(){
+		ordinaryFunction{
+			return // 错误：不能使‘foo’在此处返回
+		}
+	}
+	// 如果lambda表达式传给的函数式内联的，该return也可以内联
+	fun foo(){
+		inlineFunction{
+			return // OK：该lambda表达式式内联的
+		}
+	}
+	```
+	
+	+ 具体化的类型参数：`修饰符reified标识`
+
+	```kotlin
+	// 内联函数支持具体化的参数类型。用reified修饰符限定类型参数后即可在函数内部像一个不同类一样访问它
+	inline fun <reified T> TreeNode.findParentOfType(): T? {
+		var p = parent
+		while(p != null && p !is T){
+			p = p.parent
+		}
+		return p as T ?
+	}
+	// 调用
+	myTree.findParentOfType<MyTreeNodeType>()
+	```
+	
+	+ 内联属性：`inline修饰符用于咩有幕后字段的属性的访问器`
+
+	```kotlin
+	val foo: Foo
+		inline get() = Foo()
+	var bra: Bar
+		get() = ...
+		inline set(v) { ... }
 		
-		```kotlin
-		// 等价于 val sum: (x: Int, y: Int) -> Int = x+y
-		val sum = {x: Int, y: Int -> x + y}
-		```	 
+	inline var bar: Bar
+		get() = ...
+		set(v) { ... }
+	```
+
++ 协程：`kotline 1.1 实验性——异步编程`
+	+ 使用场景：`耗时操作，要求调用者阻塞直到耗时操作完成。—— 协程提供了一种避免阻塞线程并用更廉价、更可控的操作替代线程阻塞的方法：协程挂起`
+	+ 作用：`协程通过将复杂性放入库来简化异步编程。该库可以将用户代码的相关部分包装为回调、订阅相关事件、在不同线程（甚至不同机器）上调度执行` 
+	+ 挂起函数：`协程不能再随机的指令中挂起，只能在所谓的挂起点挂起，这会调用特别标记的函数——修饰符suspend标识的函数`
+	
+	```kotlin
+	suspend fun doSomething(foo: Foo): Bar {
+		// ...
+	}
+	fun <T> async(block: suspend () -> T)
+	```
