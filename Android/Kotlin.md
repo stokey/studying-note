@@ -138,10 +138,10 @@
 		```kotlin
 		class Person constructor(firstName:String){
 		}
-		// 如果主构造函数没有任何注解或者可见性修饰符，则可省略constructor关键字
+		// 如果主构造函数没有任何注解或者可见性修饰符，则可省略constructor修饰符
 		class Person (firstName:String){
 		}
-		// 主构造函数不能包含任何代码，初始化的代码可以放在以init关键字作为前缀的初始化块
+		// 主构造函数不能包含任何代码，初始化的代码可以放在以init修饰符作为前缀的初始化块
 		class Customer(name:String){
 			init{
 				print("Customer initialized with value ${name}")
@@ -153,7 +153,7 @@
 		}
 		```
 		
-		+ 次构造函数：`不在类头，用contructor关键字修饰的方法。如果类有一个构造函数，每个次构造函数需要委托给主构造函数`
+		+ 次构造函数：`不在类头，用contructor修饰符修饰的方法。如果类有一个构造函数，每个次构造函数需要委托给主构造函数`
 		
 		```kotlin
 		class Person {
@@ -360,7 +360,7 @@
 	val Foo.bar = 1 //错误：扩展属性不能有初始化器
 	```
 
-+ 数据类：`只保存数据的类，用data关键字标记`
++ 数据类：`只保存数据的类，用data修饰符字标记`
 	+ 声明
 
 	```kotlin
@@ -466,7 +466,7 @@
 	}
 	``` 
 
-	+ 伴生对象：`companion关键字标记——伴生对象成员可通过只使用类名作为限定符来调用`
+	+ 伴生对象：`companion修饰符标记——伴生对象成员可通过只使用类名作为限定符来调用`
 
 	```kotlin
 	// 伴生对象成员看起来像其他语言的静态成员，在运行时它们任然是真实对象的实例成员
@@ -501,7 +501,7 @@
 		+ 对象表达式：使用的时候立即执行（及初始化）
 		+ 对象声明：第一次访问到时延迟初始化
 		+ 伴生对象：相应类被加载（解析）时被初始化
-+ 委托：`关键字by标志`
++ 委托：`修饰符by标志`
 	+ 类委托
 
 	```kotlin
@@ -604,11 +604,11 @@
 	// 也适用于var属性：Map -> Mut
 	```
 		
-+ 函数：`fun关键字标识`
++ 函数：`fun修饰符标识`
 	+ 中缀表示法
 		+ 成员函数或扩展函数
 		+ 只有一个参数
-		+ 用`infix`关键字标识
+		+ 用`infix`修饰符标识
 	
 	```kotlin
 	// 给Int定义扩展
@@ -733,7 +733,7 @@
 	1.sum(2)
 	```
 	
-+ 内联函数：`关键字inline标记——高阶函数优化`
++ 内联函数：`修饰符inline标记——高阶函数优化`
 	+ 表示
 	
 	```kotlin
@@ -808,3 +808,121 @@
 	}
 	fun <T> async(block: suspend () -> T)
 	```
+	
++ 集合：`List/Set/Map——可变集合／不可变集合`
+
+```kotlin
+// 不可变集合——只读
+List<out T>/MutableList<T>
+Set<out T>/MutableSet<T>
+Map<K, out V>/MutableMap<K, V>
+// 创建方式
+listOf()/mutableListOf()
+setOf()/mutableSetOf()
+mapOf(a to b, c to d)/mutableMapOf(a to b, c to d)
+``` 
+
++ 区间
+
+```kotlin
+if (i in 1..10){
+	// 等同于 i>=1 && i<=10
+	println(i)
+}
+for (i in 1..4) print(i) // 输出1234
+for (i in 4..1) print(i) // 什么都不输出
+for (i in 4 downTo 1) print(i) // 输出4321
+for (i in 1..4 step 2) print(i) // 输出13
+for ( i in 1 until 10) print(i) // i >=1 && i < 10
+```
+
++ 类型检查与转换：`is / as`
+
+```kotlin
+// 类型检查
+if (obj is String){
+	println(obj.length)
+}
+if (obj !is String){
+	// 等价!(obj is String)
+}
+// 类型转换
+// 非安全操作
+val x: String = y as String // null 不能转换为String——不是可空，如果y为空，则会抛出一个异常
+// 安全操作
+val x: String? = y as? String
+```
+
++ 操作符重载：`修饰符operator标记`
+	+ 一元前缀操作符
+
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| +a | a.unaryPlus()|
+	| -a | a.unaryMinus()|
+	| !a | a.not()| 
+	| a++ | a.inc() |
+	| a-- | a.dec() |
+	
+	```kotlin
+	data class Point(val x: Int, val y: Int)
+	operator fun Point.unaryMinus() = Point(-x, -y)
+	val point = Point(10, 20)
+	println(-point) // 输出(-10,-20)
+	```
+	
+	+ 二元操作
+
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| a+b | a.plus(b)|
+	| a-b | a.minus(b)|
+	| a*b | a.times(b)| 
+	| a/b | a.div(b) |
+	| a%b | a.rem(b) |
+	| a..b | a.rangeTo(b) |
+	
+	```kotlin
+	data class Counter(val dayIndex: Int){
+		operator fun plus(increment: Int): Counter {
+			return Counter(dayIndex + increment )
+		}
+	}
+	```
+	
+	+ in操作符
+	
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| a in b | b.contains(a) |
+	| a !in b | !b.contains(a)|
+	
+	+ 索引访问操作符
+
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| a[i] | a.get(i)|
+	| a[i,j] | a.get(i,j)|
+	| a[i\_1, ..., i\_n] | a.get(i\_1, ..., i\_n)| 
+	| a[i] = b | a.set(i,b) |
+	| a[i,j] = b | a.set(i,j,b)|
+	|a[i\_1, ..., i\_n] = b | a.set(i\_1, ..., i\_n,b)| 
+	
+	+ 调用操作符
+
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| a() | a.invoke()|
+	| a(i) | a.invoke(i)|
+	| a(i, j) | a.invoke(i, j)| 
+	|a(i\_1, ..., i\_n)| a.invoke(i\_1, ..., i\_n,b)|
+	
+	+ 相等与不相等操作符
+
+	| 表达式 | 翻译为 |
+	| :--: | :--: |
+	| a == b | a?.equals(b) ?: (b === null)|
+	| a != b | !(a?.equals(b) ?: (b === null))|
+
++ Nothing类型：`throw 表达式的类型是特殊类型Nothing，该类型没有值，用于标记永远不能到达的代码位置`
+
